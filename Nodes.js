@@ -4,6 +4,7 @@ class nodes{
 		this.incomingEdges=input.incomingEdges;
 		this.nodesOfType = input.nodesOfType;	
 		this.loneCells = input.loneCells;	
+		this.nodeType=input.cellType;
 	};
 	getLoneCells(){
 		return this.loneCells;
@@ -16,6 +17,9 @@ class nodes{
 		}
 		return result;
 	}*/
+	getNodeType(nodeId){
+		return this.nodeType[nodeId];
+	}
 	getOutgoingEdgesOfTypes(nodeId,labels){
 		
 		let result=[];

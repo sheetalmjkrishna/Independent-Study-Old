@@ -1,6 +1,23 @@
 var globalData = {};
-d3.json('some_hops.json', function(error, data) {
-    data = JSON.parse(JSON.stringify(data).replace(/SourceStructureID/g, "source").replace(/TargetStructureID/g, "target").replace(/StructureID/g, "id").replace(/SourceID/g, "source").replace(/TargetID/g, "target").replace(/ID/g, "id"));
+$(window).on('load', function() {
+    $('#myModal').modal('show');
+});
+
+function loadFileAsText() {
+    let fileToLoad = document.getElementById("fileToLoad").files[0];
+
+    let fileReader = new FileReader();
+    fileReader.onload = function(fileLoadedEvent) {
+        let textFromFileLoaded = fileLoadedEvent.target.result;
+        loadData(textFromFileLoaded);
+    };
+    fileReader.readAsText(fileToLoad, "UTF-8");
+    $('#myModal').modal('hide');
+}
+//d3.json('some_hops.json', function(error, data) {
+function loadData(data) {
+    data = JSON.parse(data.replace(/SourceStructureID/g, "source").replace(/TargetStructureID/g, "target").replace(/StructureID/g, "id").replace(/SourceID/g, "source").replace(/TargetID/g, "target").replace(/ID/g, "id"));
+    //data = JSON.parse(JSON.stringify(data).replace(/SourceStructureID/g, "source").replace(/TargetStructureID/g, "target").replace(/StructureID/g, "id").replace(/SourceID/g, "source").replace(/TargetID/g, "target").replace(/ID/g, "id"));
     let globalNode = 0;
     let globalEdge = 0;
     let optgroupDict = {};
@@ -108,11 +125,13 @@ d3.json('some_hops.json', function(error, data) {
     object.incomingEdges = node_incomingEdges;
     object.nodesOfType = optgroupDict;
     object.loneCells = loneCells;
+    object.cellType = listOfNodes;
     globalNode = new nodes(object);
 
     object = new Object();
     object.edge_source = edge_source;
     object.edge_dest = edge_dest;
+    object.edgeType = listOfEdges;
     globalEdge = new edges(object);
 
     globalData["node"] = globalNode;
@@ -124,7 +143,8 @@ d3.json('some_hops.json', function(error, data) {
         });
         $("[value='2']").trigger("click");
     });
-});
+}
+//});
 
 function generateDropdowns(hops, typesOfEdges, optgroupDict) {
     $('#dropdowns').html("");
@@ -226,7 +246,7 @@ function generateDropdowns(hops, typesOfEdges, optgroupDict) {
         "type": "button",
         "class": "btn btn-default",
         "id": "submitButton",
-        "onclick": "getPaths(this)"
+        "onclick": "submit(this)"
     }).text("Get Paths"));
     div0.append(div4);
     setTimeout(function() {
@@ -253,9 +273,10 @@ function generateDropdowns(hops, typesOfEdges, optgroupDict) {
         $('.edgeDropdown .multiselect-container').addClass("pull-right");
     }, 2);
     $("#toggle").css("top", window.innerHeight / 2 + "px");
+    $("#filters a label").css("width", "90%");
 }
 
-function getPaths(e) {
+function submit(e) {
     let flag = 0;
     $.each($(e.parentElement.parentElement.parentElement).find("select"), function(index, value) {
         if ($(value).val().length == 0) {
@@ -266,101 +287,124 @@ function getPaths(e) {
     });
     if (flag)
         return;
-    let hops = parseInt($("[name='length']:checked").val());
-    listOfPathsPreFinal = [];
-    listOfPathsFinal = [];
     let left = $("#cell-dropdown1").val();
+    let cells = [];
+    $.each($("[id ^='cell']"), function(i, v) {
+        cells.push($(v).val());
+    });
+    let edges = [];
+    $.each($("[id ^='edge']"), function(i, v) {
+        edges.push($(v).val());
+    });
+    let paths = getPaths(cells, edges);
+    drawPaths(paths);
+}
+
+function drawPaths(paths) {
+    if (Object.keys(paths).length == 0) {
+        alert("No paths present for chosen combination!");
+        $("#paths").html("");
+        return;
+    }
+
+    $("#paths").html("Paths are: <br/>")
+    let i = 1;
+    for (let path in paths) {
+        let printablePath = "";
+        for (let partOfPath of paths[path]) {
+            printablePath += (partOfPath[0] + "(" + globalData.node.getNodeType(partOfPath[0]) + ")" + " - ");
+            printablePath += (partOfPath[1] + "(" + globalData.edge.getEdgeType(partOfPath[1]) + ")" + " - ");
+            printablePath += (partOfPath[2] + "(" + globalData.node.getNodeType(partOfPath[2]) + ")" + "  ");
+        }
+        $("#paths").append(i + ") " + printablePath + "<br/>");
+        console.log(i + ") " + printablePath);
+        i++;
+    }
+}
+
+function getPaths(validCells, validEdges) {
+    /*
+      FINAL PATHS:
+      UNIQUE ID: PATH
+      EG:
+      {
+          1:[[LeftNode,Edge,RightNode],[LeftNode,Edge,RightNode],[LeftNode,Edge,RightNode]]
+          2:[[LeftNode,Edge,RightNode],[LeftNode,Edge,RightNode],[LeftNode,Edge,RightNode]]
+      }
+      The above is in the firm of:
+      {
+          1:[PartOfPath1, PartOfPath2,PartOfPath3]
+          2:[PartOfPath1, PartOfPath2,PartOfPath3]
+      }
+      Steps:
+      -Find First "part of path" add to final paths dict
+      -from the end point sof the previous part of paths see if you can form another set of part of paths, if you can't, remove this part of path else attach the next part pf path
+      -do this recursively
+      */
+    let pathId = 1;
+    let listOfPathsFinal = {};
+    let pathContinuity = {};
+    let left = validCells[0];
     left = left.map(a => parseInt(a));
     let right = [];
-    for (let i = 1; i <= hops; i++) {
-        //EACH TIME FIND O---O; TEMP NODES TO THE NEW SET OF TEMP NODES	
-        let edges = [];
-        right = $("#cell-dropdown" + (i + 1)).val();
+    let hops = validEdges.length;
+    for (let i = 0; i < hops; i++) {
+        //EACH TIME FIND O---O; TEMP NODES TO THE NEW SET OF TEMP NODES 
+        //reset pathContinuity
+        for (let id in pathContinuity) {
+            pathContinuity[id] = false;
+        }
+        right = validCells[i + 1];
         right = right.map(a => parseInt(a));
-        let paths = [];
+        let newLeft = [];
         for (let node of left) {
-            let temp = globalData.node.getOutgoingEdgesOfTypes(node, $("#edge-dropdown" + i).val());
-            for (let edge of temp)
-                edges.push(edge);
-        }
-        left = [];
-        for (let edge of edges) {
-            if (right.includes(globalData.edge.getEdgeDest(edge))) {
-                paths.push(edge);
-                left.push(globalData.edge.getEdgeDest(edge));
-            }
-
-        }
-        listOfPathsPreFinal[i] = paths;//.join();
-    }
-    let right1 = [],
-        right2 = [];
-    for (let j = hops; j >= 1; j--) {
-        if (j == hops) {
-            listOfPathsFinal[j] = listOfPathsPreFinal[j];//.replace(/,/g, "<br/>");
-            if(listOfPathsFinal[j].length==0){
-            	alert("No paths available for search criteria!");
-            	return;
-            }
-            //for (let item of listOfPathsFinal[j].split(',').map(a => parseInt(a))) {
-            for (let item of listOfPathsFinal[j].map(a => parseInt(a))) {
-                right1.push(globalData.edge.getEdgeSource(item));
-            }
-            listOfPathsFinal[j]= listOfPathsFinal[j].map(a => parseInt(a));
-        } else {
-        	if(listOfPathsPreFinal[j].length==0){
-            	alert("No paths available for search criteria!");
-            	return;
-            }
-            let temp = [];
-            //for (let item of listOfPathsPreFinal[j].split(',').map(a => parseInt(a))) {
-            	for (let item of listOfPathsPreFinal[j].map(a => parseInt(a))) {
-                if (right1.includes(globalData.edge.getEdgeDest(item))) {
-                    temp.push(item);
-                    right2.push(globalData.edge.getEdgeSource(item));
+            let tempEdges = globalData.node.getOutgoingEdgesOfTypes(node, validEdges[i]);
+            for (let edge of tempEdges) {
+                let destinationNode = globalData.edge.getEdgeDest(edge);
+                if (right.includes(destinationNode)) {
+                    let partOfPath = [node, edge, destinationNode];
+                    if (i == 0) {
+                        listOfPathsFinal[pathId] = [];
+                        listOfPathsFinal[pathId].push(partOfPath);
+                        pathContinuity[pathId] = false;
+                        pathId++;
+                    } else {
+                        for (let id in listOfPathsFinal) { //for each path that we have:
+                            //if we haven't added another partOfPath and the last node of this path matches the source of the current edge
+                            //OR we have added another partOfPath and the second last node of this path matches the source of the current edge
+                            if ((!pathContinuity[id] && listOfPathsFinal[id][listOfPathsFinal[id].length - 1][2] == node) || (pathContinuity[id] && listOfPathsFinal[id][listOfPathsFinal[id].length - 2][2] == node)) //if the last partOfPath's dest node is the current path of part's source node, then attach them
+                            {
+                                if (pathContinuity[id]) //if this is NOT the first path of part that we want to attach to this path, create a new path instead of just attaching it
+                                {
+                                    //creating new path by first copying previous path
+                                    let previousPath = listOfPathsFinal[id].slice();
+                                    previousPath.pop(); //to remove the new path of part that we've attached
+                                    listOfPathsFinal[pathId] = previousPath;
+                                    listOfPathsFinal[pathId].push(partOfPath);
+                                    pathContinuity[pathId] = true;
+                                    pathId++;
+                                } else {
+                                    listOfPathsFinal[id].push(partOfPath);
+                                    pathContinuity[id] = true;
+                                }
+                            }
+                        }
+                    }
+                    if (!newLeft.includes(destinationNode))
+                        newLeft.push(destinationNode);
                 }
             }
-            right1 = right2;
-            listOfPathsFinal[j] = temp;//.join();//('</br>');
+        }
+        left = newLeft;
+        //Now remove half constructed paths that we a=weren't able to extend in this iteration
+        if (i != 0) {
+            for (let id in pathContinuity) {
+                if (!pathContinuity[id]) {
+                    delete pathContinuity[id];
+                    delete listOfPathsFinal[id];
+                }
+            }
         }
     }
-    for (let i = 1; i <= hops; i++) {
-    	let temp=[];
-    	if(i==1){
-    		temp = listOfPathsFinal[i].sort(function(x, y){
-			   return d3.ascending(globalData.edge.getEdgeSource(x), globalData.edge.getEdgeSource(y));
-			});
-    	}
-    	else if(i==2){
-    		$.each(listOfPathsFinal[i-1],function (index1,value1){    			
-    		let temp2=[];
-    			for(let value2 of listOfPathsFinal[i]){
-    				if(globalData.edge.getEdgeSource(value2)==globalData.edge.getEdgeDest(value1)){
-    					temp2.push(value2);
-    				}
-    			}
-    		temp.push(temp2);
-    		});
-    			
-    		}
-    		else {
-    		$.each(listOfPathsFinal[i-1],function (index1,value1){    			
-    		let temp2=[];
-    		$.each(value1,function (index2,value2){    
-    			for(let value3 of listOfPathsFinal[i]){
-    				if(globalData.edge.getEdgeSource(value3)==globalData.edge.getEdgeDest(value2)){
-    					temp2.push(value3);
-    				}
-    			}
-    			temp2.push('*');
-    		});
-    		temp.push(temp2);
-    		});
-    			
-    		}
-    		listOfPathsFinal[i]=temp;
-    	}
-    	
-        //$("#hop"+i+"-edges").html(listOfPathsFinal[i]+"<br/>");
-
-    }
+    return listOfPathsFinal;
+}

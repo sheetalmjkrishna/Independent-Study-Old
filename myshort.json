@@ -1,0 +1,191 @@
+{
+    "nodes": [{
+        "StructureID": 1,
+        "TypeID": 1,
+        "Label": "YAC Ai",
+        "Tags": "\u003cStructure\u003e\u003cAttrib Name=\"S1\" Value=\"1.0\" /\u003e\u003c/Structure\u003e"
+    },
+    {
+        "StructureID": 2,
+        "TypeID": 1,
+        "Label": "YAC Ai",
+        "Tags": "\u003cStructure\u003e\u003cAttrib Name=\"S1\" Value=\"1.0\" /\u003e\u003c/Structure\u003e"
+    },
+    {
+        "StructureID": 3,
+        "TypeID": 1,
+        "Label": "YAC Ai",
+        "Tags": "\u003cStructure\u003e\u003cAttrib Name=\"S1\" Value=\"1.0\" /\u003e\u003c/Structure\u003e"
+    },
+    {
+        "StructureID": 4,
+        "TypeID": 1,
+        "Label": "YAC Ai",
+        "Tags": "\u003cStructure\u003e\u003cAttrib Name=\"S1\" Value=\"1.0\" /\u003e\u003c/Structure\u003e"
+    },
+    {
+        "StructureID": 5,
+        "TypeID": 1,
+        "Label": "YAC Ai",
+        "Tags": "\u003cStructure\u003e\u003cAttrib Name=\"S1\" Value=\"1.0\" /\u003e\u003c/Structure\u003e"
+    },
+    {
+        "StructureID": 6,
+        "TypeID": 1,
+        "Label": "YAC Ai",
+        "Tags": "\u003cStructure\u003e\u003cAttrib Name=\"S1\" Value=\"1.0\" /\u003e\u003c/Structure\u003e"
+    },
+    {
+        "StructureID": 7,
+        "TypeID": 1,
+        "Label": "YAC Ai",
+        "Tags": "\u003cStructure\u003e\u003cAttrib Name=\"S1\" Value=\"1.0\" /\u003e\u003c/Structure\u003e"
+    },
+    {
+        "StructureID": 8,
+        "TypeID": 1,
+        "Label": "YAC Ai",
+        "Tags": "\u003cStructure\u003e\u003cAttrib Name=\"S1\" Value=\"1.0\" /\u003e\u003c/Structure\u003e"
+    },
+    {
+        "StructureID": 9,
+        "TypeID": 1,
+        "Label": "YAC Ai",
+        "Tags": "\u003cStructure\u003e\u003cAttrib Name=\"S1\" Value=\"1.0\" /\u003e\u003c/Structure\u003e"
+    },
+    {
+        "StructureID": 10,
+        "TypeID": 1,
+        "Label": "YAC Ai",
+        "Tags": "\u003cStructure\u003e\u003cAttrib Name=\"S1\" Value=\"1.0\" /\u003e\u003c/Structure\u003e"
+    },
+    {
+        "StructureID": 11,
+        "TypeID": 1,
+        "Label": "YAC Ai",
+        "Tags": "\u003cStructure\u003e\u003cAttrib Name=\"S1\" Value=\"1.0\" /\u003e\u003c/Structure\u003e"
+    },
+    {
+        "StructureID": 12,
+        "TypeID": 1,
+        "Label": "YAC Ai",
+        "Tags": "\u003cStructure\u003e\u003cAttrib Name=\"S1\" Value=\"1.0\" /\u003e\u003c/Structure\u003e"
+    }],
+    "edges": [{
+        "ID": 1,
+        "SourceStructureID": 1,
+        "TargetStructureID": 4,
+        "Label": "514-179 via Adherens from 103814 -\u003e 103813",
+        "Type": "A",
+        "Directional": true,
+        "Links": [{
+            "SourceID": 103814,
+            "TargetID": 103813,
+            "Directional": false
+        }]
+    },
+    {
+        "ID": 2,
+        "SourceStructureID": 1,
+        "TargetStructureID": 5,
+        "Label": "514-179 via Adherens from 103814 -\u003e 103813",
+        "Type": "B",
+        "Directional": true,
+        "Links": [{
+            "SourceID": 103814,
+            "TargetID": 103813,
+            "Directional": false
+        }]
+    },
+    {
+        "ID": 3,
+        "SourceStructureID": 2,
+        "TargetStructureID": 5,
+        "Label": "514-179 via Adherens from 103814 -\u003e 103813",
+        "Type": "C",
+        "Directional": true,
+        "Links": [{
+            "SourceID": 103814,
+            "TargetID": 103813,
+            "Directional": false
+        }]
+    },
+    {
+        "ID": 4,
+        "SourceStructureID": 5,
+        "TargetStructureID": 7,
+        "Label": "514-179 via Adherens from 103814 -\u003e 103813",
+        "Type": "D",
+        "Directional": true,
+        "Links": [{
+            "SourceID": 103814,
+            "TargetID": 103813,
+            "Directional": false
+        }]
+    },
+    {
+        "ID": 5,
+        "SourceStructureID": 5,
+        "TargetStructureID": 8,
+        "Label": "514-179 via Adherens from 103814 -\u003e 103813",
+        "Type": "A",
+        "Directional": true,
+        "Links": [{
+            "SourceID": 103814,
+            "TargetID": 103813,
+            "Directional": false
+        }]
+    },
+    {
+        "ID": 6,
+        "SourceStructureID": 6,
+        "TargetStructureID": 9,
+        "Label": "514-179 via Adherens from 103814 -\u003e 103813",
+        "Type": "C",
+        "Directional": true,
+        "Links": [{
+            "SourceID": 103814,
+            "TargetID": 103813,
+            "Directional": false
+        }]
+    },
+    {
+        "ID": 7,
+        "SourceStructureID": 8,
+        "TargetStructureID": 10,
+        "Label": "514-179 via Adherens from 103814 -\u003e 103813",
+        "Type": "Q",
+        "Directional": true,
+        "Links": [{
+            "SourceID": 103814,
+            "TargetID": 103813,
+            "Directional": false
+        }]
+    },
+    {
+        "ID": 8,
+        "SourceStructureID": 8,
+        "TargetStructureID": 11,
+        "Label": "514-179 via Adherens from 103814 -\u003e 103813",
+        "Type": "B",
+        "Directional": true,
+        "Links": [{
+            "SourceID": 103814,
+            "TargetID": 103813,
+            "Directional": false
+        }]
+    },
+    {
+        "ID": 9,
+        "SourceStructureID": 10,
+        "TargetStructureID": 12,
+        "Label": "514-179 via Adherens from 103814 -\u003e 103813",
+        "Type": "P",
+        "Directional": true,
+        "Links": [{
+            "SourceID": 103814,
+            "TargetID": 103813,
+            "Directional": false
+        }]
+    }]
+}

@@ -1,49 +1,66 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-      <!--SCRIPT FILES-->
-    <script src="https://d3js.org/d3.v4.js"></script>    
+    <!--SCRIPT FILES-->
+    <script src="https://d3js.org/d3.v4.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="https://www.jquery-az.com/boots/js/bootstrap-multiselect/bootstrap-multiselect.js"></script>
     <script type="text/javascript" src="Nodes.js"></script>
     <script type="text/javascript" src="Edges.js"></script>
-    <script type="text/javascript" src="script.js"></script>    
+    <script type="text/javascript" src="script.js"></script>
     <!--CSS FILES-->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://www.jquery-az.com/boots/css/bootstrap-multiselect/bootstrap-multiselect.css" type="text/css">
     <link rel="stylesheet" href="style.css">
 </head>
-<body>
+
 <body>
     <div class="row">
-            <div id="slide">
-                <div id="toggle">&#9776;</div>
-                <div id="filters" class="smooth-scroll">
-                    <div id="filterHeading">
-                        <h2>FILTERS</h2>
-                    </div>
-                    <div id="filterBody">
-                        <div class="filterBodyItem">
-                            <h4>Length:</h4>
-                            <div class="radio length">
-                                <label><input type="radio" value="0" name="length">0 hop (Lone Cells)</label>
-                                <label><input type="radio" value="1" name="length">1 hop</label>
-                                <label><input type="radio" value="2" checked="checked" name="length">2 hops</label>
-                                <label><input type="radio" value="3" name="length">3 hops</label>
-                            </div>
-                        </div>
-                        <div id="dropdowns"></div>    
+        <div id="slide">
+            <div id="toggle">&#9776;</div>
+            <div id="filters" class="smooth-scroll">
+                <div id="filterHeading">
+                    <h2>FILTERS</h2>
                 </div>
-            </div>            
-          </div>
-          <div class="col-md-12 col-sm-8 main-content">
-               <div id="paths" class="col-md-9">
-                  <div id="hop1-edges" class="col-md-3"> </div>
-                  <div id="hop2-edges" class="col-md-3"> </div>
-                  <div id="hop3-edges" class="col-md-3"> </div>
-               </div>
-          </div>
-</body>
+                <div id="filterBody">
+                    <div class="filterBodyItem">
+                        <h4>Length:</h4>
+                        <div class="radio length">
+                            <label><input type="radio" value="0" name="length">0 hop (Lone Cells)</label>
+                            <label><input type="radio" value="1" name="length">1 hop</label>
+                            <label><input type="radio" value="2" checked="checked" name="length">2 hops</label>
+                            <label><input type="radio" value="3" name="length">3 hops</label>
+                            <!--<label><input type="radio" value="4" name="length">4 hops</label>-->
+                        </div>
+                    </div>
+                    <div id="dropdowns"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12 col-sm-8 main-content">
+            <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Choose File</h5>
+                            <!--<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                              <span aria-hidden="true">&times;</span>
+                            </button>-->
+                        </div>
+                        <div class="modal-body">
+                            <input type="file" id="fileToLoad">
+                        </div>
+                        <div class="modal-footer">
+                            <!--<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>-->
+                            <button type="button" onclick="loadFileAsText()" class="btn btn-primary">Load Selected File</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="paths" class="col-md-9">
+            </div>
+        </div>    
+    </div>
 </body>
 </html>

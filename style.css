@@ -159,3 +159,19 @@
     .caret-container{
       float: right;
     }
+
+    span.multiselect-selected-text{
+      display: inline-block;
+      max-width: 90px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    button.multiselect .dropdown-toggle{
+      max-width: 124px;
+    }
+
+    button > b{
+      margin-bottom: 10px;
+    }
