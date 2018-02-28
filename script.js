@@ -1,125 +1,178 @@
 var globalData = {};
 $(window).on('load', function() {
+    $("#loadFile").prop('disabled', true);
+    $("#loadSample").on("change", function() {
+        if ($(this).is(":checked")) {
+            $("#fileToLoad").closest(".col-md-4").hide();
+            $("#loadFile").prop('disabled', false);
+        } else {
+            $("#fileToLoad").closest(".col-md-4").show();
+            if ($("#fileToLoad").val().length > 1)
+                $("#loadFile").prop('disabled', false);
+            else
+                $("#loadFile").prop('disabled', true);
+        }
+    });
+    $("#fileToLoad").on("change", function() {
+        $("#fileName").html($("#fileToLoad").val().replace("C:\\fakepath\\", ""));
+        $("#loadFile").prop('disabled', false);
+    });
     $('#myModal').modal('show');
 });
 
 function loadFileAsText() {
-    let fileToLoad = document.getElementById("fileToLoad").files[0];
+    if ($("#loadSample").is(":checked")) {
+        d3.json('some_hops.json', function(error, data) {
+            loadData(data);
+        });
+        $('#myModal').modal('hide');
+    } else {
+        let fileToLoad = document.getElementById("fileToLoad").files[0];
+        let fileReader = new FileReader();
+        fileReader.onload = function(fileLoadedEvent) {
+            let textFromFileLoaded = JSON.parse(fileLoadedEvent.target.result);
+            if (textFromFileLoaded.nodes.length < 1 || textFromFileLoaded.edges.length < 1)
+                alert("Invalid File!");
+            else {
+                loadData(textFromFileLoaded);
+                $('#myModal').modal('hide');
+            }
 
-    let fileReader = new FileReader();
-    fileReader.onload = function(fileLoadedEvent) {
-        let textFromFileLoaded = fileLoadedEvent.target.result;
-        loadData(textFromFileLoaded);
-    };
-    fileReader.readAsText(fileToLoad, "UTF-8");
-    $('#myModal').modal('hide');
+        };
+        fileReader.readAsText(fileToLoad, "UTF-8");
+    }
+
 }
-//d3.json('some_hops.json', function(error, data) {
+
 function loadData(data) {
-    data = JSON.parse(data.replace(/SourceStructureID/g, "source").replace(/TargetStructureID/g, "target").replace(/StructureID/g, "id").replace(/SourceID/g, "source").replace(/TargetID/g, "target").replace(/ID/g, "id"));
+    //  data = JSON.parse(data.replace(/SourceStructureID/g, "source").replace(/TargetStructureID/g, "target").replace(/StructureID/g, "id").replace(/SourceID/g, "source").replace(/TargetID/g, "target").replace(/ID/g, "id"));
     //data = JSON.parse(JSON.stringify(data).replace(/SourceStructureID/g, "source").replace(/TargetStructureID/g, "target").replace(/StructureID/g, "id").replace(/SourceID/g, "source").replace(/TargetID/g, "target").replace(/ID/g, "id"));
+
     let globalNode = 0;
     let globalEdge = 0;
     let optgroupDict = {};
-    let loneCells = [];
+    let loneCells = {};
     let listOfNodes = {};
     let listOfEdges = {};
-    let typesOfEdges = [];
+    let typesOfEdges = {};
     let edge_source = {};
     let edge_dest = {};
     let node_outgoingEdges = {};
     let node_incomingEdges = {};
-    $.each(data.nodes, function(index, value) {
-        if (value.Label == null || value.Label.trim() == "") {
-            value.Label = "Unknown";
-        }
-        if (value.Label.trim() in optgroupDict) {
-            if (!(optgroupDict[value.Label.trim()].includes(value.id)))
-                optgroupDict[value.Label.trim()].push(value.id);
-        } else {
-            optgroupDict[value.Label.trim()] = [value.id];
-        }
-        if ((!loneCells.includes(value.id))) {
-            loneCells.push(value.id); //initially add everything as a lone cell
-            listOfNodes[value.id] = value.Label.trim();
-        }
-    });
-    $.each(data.edges, function(index, value) {
-        if (!(value.source in listOfNodes)) {
-            if ("Unknown" in optgroupDict)
-                optgroupDict["Unknown"].push(value.source);
-            else
-                optgroupDict["Unknown"] = [value.source];
-            listOfNodes[value.source] = "Unknown";
-        } else {
-            let index = loneCells.indexOf(value.source);
-            if (index > -1) {
-                loneCells.splice(index, 1); //not a lone cell, so remove
+    let loadNodes=function(){
+        $.each(data.nodes, function(index, value) {
+            let label="";
+            if (value.Label == null || value.Label.trim() == "") {
+                label = "Unknown";
             }
-        }
-        if (!(value.target in listOfNodes)) {
-            if ("Unknown" in optgroupDict)
-                optgroupDict["Unknown"].push(value.target);
-            else
-                optgroupDict["Unknown"] = [value.target];
-            listOfNodes[value.target] = "Unknown";
-        } else {
-            let index = loneCells.indexOf(value.target);
-            if (index > -1) {
-                loneCells.splice(index, 1); //not a lone cell, so remove
-            }
-        }
-        if (value.Type == null || value.Type == "") {
-            value.Type = "Unknown";
-        }
-        if (!(typesOfEdges.includes(value.Type.trim()))) {
-            typesOfEdges.push(value.Type.trim());
-        }
-        listOfEdges[value.id] = value.Type.trim();
-        edge_source[value.id] = value.source;
-        edge_dest[value.id] = value.target;
-        if (value.Directional) {
-            if (value.source in node_outgoingEdges) {
-                node_outgoingEdges[value.source][value.id] = value.Type.trim();
+            else{
+                label=value.Label.trim();
+            }        
+            if (label in optgroupDict) {
+                /*if (!(optgroupDict[label].includes(value.StructureID)))
+                    optgroupDict[label].push(value.StructureID);*/
+                    optgroupDict[label].push(value.StructureID);
             } else {
-                node_outgoingEdges[value.source] = {};
-                node_outgoingEdges[value.source][value.id] = value.Type.trim();
+                optgroupDict[label] = [value.StructureID];
             }
-            if (value.target in node_incomingEdges) {
-                node_incomingEdges[value.target][value.id] = value.Type.trim();
+            /*if ((!loneCells.includes(value.StructureID))) {
+                loneCells.push(value.StructureID); //initially add everything as a lone cell
+                listOfNodes[value.StructureID] = label;
+            }*/
+            listOfNodes[value.StructureID] = label;
+            loneCells[value.StructureID]=true;
+        });
+        for(let label in optgroupDict){
+            optgroupDict[label]=Array.from(new Set(optgroupDict[label]));
+        }
+    }
+    let loadEdges=function(){
+        $.each(data.edges, function(index, value) {
+            if (!(value.SourceStructureID in listOfNodes)) {
+                if ("Unknown" in optgroupDict)
+                    optgroupDict["Unknown"].push(value.SourceStructureID);
+                else
+                    optgroupDict["Unknown"] = [value.SourceStructureID];
+                listOfNodes[value.SourceStructureID] = "Unknown";
             } else {
-                node_incomingEdges[value.target] = {};
-                node_incomingEdges[value.target][value.id] = value.Type.trim();
+                /*let index = loneCells.indexOf(value.SourceStructureID);
+                if (index > -1) {
+                    loneCells.splice(index, 1); //not a lone cell, so remove
+                }*/
+                loneCells[value.SourceStructureID]=false;
             }
-        } else {
-            if (value.source in node_outgoingEdges) {
-                node_outgoingEdges[value.source][value.id] = value.Type.trim();
+            if (!(value.TargetStructureID in listOfNodes)) {
+                if ("Unknown" in optgroupDict)
+                    optgroupDict["Unknown"].push(value.TargetStructureID);
+                else
+                    optgroupDict["Unknown"] = [value.TargetStructureID];
+                listOfNodes[value.TargetStructureID] = "Unknown";
             } else {
-                node_outgoingEdges[value.source] = {};
-                node_outgoingEdges[value.source][value.id] = value.Type.trim();
+                /*let index = loneCells.indexOf(value.TargetStructureID);
+                if (index > -1) {
+                    loneCells.splice(index, 1); //not a lone cell, so remove
+                }*/
+                loneCells[value.TargetStructureID]=false;
             }
-            if (value.source in node_incomingEdges) {
-                node_incomingEdges[value.source][value.id] = value.Type.trim();
+            let edgeType=value.Type.trim();
+            if (value.Type == null || edgeType == "") {
+                value.Type = "Unknown";
+            }
+            /*if (!(typesOfEdges.includes(edgeType))) {
+                typesOfEdges.push(edgeType);
+            }*/
+            typesOfEdges[edgeType]=1;
+            listOfEdges[value.ID] = edgeType;
+            edge_source[value.ID] = value.SourceStructureID;
+            edge_dest[value.ID] = value.TargetStructureID;
+            if (value.Directional) {
+                if (value.SourceStructureID in node_outgoingEdges) {
+                    node_outgoingEdges[value.SourceStructureID][value.ID] = edgeType;
+                } else {
+                    node_outgoingEdges[value.SourceStructureID] = {};
+                    node_outgoingEdges[value.SourceStructureID][value.ID] = edgeType;
+                }
+                if (value.TargetStructureID in node_incomingEdges) {
+                    node_incomingEdges[value.TargetStructureID][value.ID] = edgeType;
+                } else {
+                    node_incomingEdges[value.TargetStructureID] = {};
+                    node_incomingEdges[value.TargetStructureID][value.ID] = edgeType;
+                }
             } else {
-                node_incomingEdges[value.source] = {};
-                node_incomingEdges[value.source][value.id] = value.Type.trim();
-            }
+                if (value.SourceStructureID in node_outgoingEdges) {
+                    node_outgoingEdges[value.SourceStructureID][value.ID] = edgeType;
+                } else {
+                    node_outgoingEdges[value.SourceStructureID] = {};
+                    node_outgoingEdges[value.SourceStructureID][value.ID] = edgeType;
+                }
+                if (value.SourceStructureID in node_incomingEdges) {
+                    node_incomingEdges[value.SourceStructureID][value.ID] = edgeType;
+                } else {
+                    node_incomingEdges[value.SourceStructureID] = {};
+                    node_incomingEdges[value.SourceStructureID][value.ID] = edgeType;
+                }
 
 
-            if (value.target in node_incomingEdges) {
-                node_incomingEdges[value.target][value.id] = value.Type.trim();
-            } else {
-                node_incomingEdges[value.target] = {};
-                node_incomingEdges[value.target][value.id] = value.Type.trim();
+                if (value.TargetStructureID in node_incomingEdges) {
+                    node_incomingEdges[value.TargetStructureID][value.ID] = edgeType;
+                } else {
+                    node_incomingEdges[value.TargetStructureID] = {};
+                    node_incomingEdges[value.TargetStructureID][value.ID] = edgeType;
+                }
+                if (value.TargetStructureID in node_outgoingEdges) {
+                    node_outgoingEdges[value.TargetStructureID][value.ID] = edgeType;
+                } else {
+                    node_outgoingEdges[value.TargetStructureID] = {};
+                    node_outgoingEdges[value.TargetStructureID][value.ID] = edgeType;
+                }
             }
-            if (value.target in node_outgoingEdges) {
-                node_outgoingEdges[value.target][value.id] = value.Type.trim();
-            } else {
-                node_outgoingEdges[value.target] = {};
-                node_outgoingEdges[value.target][value.id] = value.Type.trim();
-            }
-        }
-    });
+        });
+    typesOfEdges=Object.keys(typesOfEdges);
+    loneCells=Object.keys(loneCells).filter(c=>loneCells[c]==true).map(d => parseInt(d));
+    }
+    loadNodes();
+    loadEdges();
+
     let object = new Object();
     object.outgoingEdges = node_outgoingEdges;
     object.incomingEdges = node_incomingEdges;
@@ -143,7 +196,7 @@ function loadData(data) {
         });
         $("[value='2']").trigger("click");
     });
-}
+} //comment for loading from server directly
 //});
 
 function generateDropdowns(hops, typesOfEdges, optgroupDict) {
@@ -212,6 +265,8 @@ function generateDropdowns(hops, typesOfEdges, optgroupDict) {
             includeSelectAllOption: true,
             enableCaseInsensitiveFiltering: true
         });
+        select2.multiselect('selectAll', false);
+        select2.multiselect('updateButtonText');
     }
     let div0 = $("<div />").attr("class", "filterBodyItem row");
     let div3 = $("<div />").attr("class", "nodeDropdown");
@@ -265,8 +320,10 @@ function generateDropdowns(hops, typesOfEdges, optgroupDict) {
             if (e.target.type == "checkbox") {
                 if (e.target.checked) {
                     $(e.target.closest("ul")).find('.multiselect-group input').not(":checked").trigger('click');
+                    e.stopPropagation();
                 } else {
                     $(e.target.closest("ul")).find('.multiselect-group input').trigger('click');
+                    e.stopPropagation();
                 }
             }
         });
@@ -317,7 +374,7 @@ function drawPaths(paths) {
             printablePath += (partOfPath[2] + "(" + globalData.node.getNodeType(partOfPath[2]) + ")" + "  ");
         }
         $("#paths").append(i + ") " + printablePath + "<br/>");
-        console.log(i + ") " + printablePath);
+        // console.log(i + ") " + printablePath);
         i++;
     }
 }
@@ -331,7 +388,7 @@ function getPaths(validCells, validEdges) {
           1:[[LeftNode,Edge,RightNode],[LeftNode,Edge,RightNode],[LeftNode,Edge,RightNode]]
           2:[[LeftNode,Edge,RightNode],[LeftNode,Edge,RightNode],[LeftNode,Edge,RightNode]]
       }
-      The above is in the firm of:
+      The above is of the form:
       {
           1:[PartOfPath1, PartOfPath2,PartOfPath3]
           2:[PartOfPath1, PartOfPath2,PartOfPath3]
@@ -396,7 +453,7 @@ function getPaths(validCells, validEdges) {
             }
         }
         left = newLeft;
-        //Now remove half constructed paths that we a=weren't able to extend in this iteration
+        //Now remove half constructed paths that we weren't able to extend in this iteration
         if (i != 0) {
             for (let id in pathContinuity) {
                 if (!pathContinuity[id]) {

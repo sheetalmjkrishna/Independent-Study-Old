@@ -5,20 +5,24 @@
     <script src="https://d3js.org/d3.v4.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-    <script type="text/javascript" src="https://www.jquery-az.com/boots/js/bootstrap-multiselect/bootstrap-multiselect.js"></script>
+   <!-- <script type="text/javascript" src="https://www.jquery-az.com/boots/js/bootstrap-multiselect/bootstrap-multiselect.js"></script>
+   <script type="text/javascript" src="http://davidstutz.de/bootstrap-multiselect/dist/js/bootstrap-multiselect.js"></script>-->
+   <script type="text/javascript" src="bootstrap-multiselect.js"></script>
     <script type="text/javascript" src="Nodes.js"></script>
     <script type="text/javascript" src="Edges.js"></script>
     <script type="text/javascript" src="script.js"></script>
     <!--CSS FILES-->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://www.jquery-az.com/boots/css/bootstrap-multiselect/bootstrap-multiselect.css" type="text/css">
+   <!-- <link rel="stylesheet" href="https://www.jquery-az.com/boots/css/bootstrap-multiselect/bootstrap-multiselect.css" type="text/css">
+   <link rel="stylesheet" type="text/css" href="http://davidstutz.de/bootstrap-multiselect/dist/css/bootstrap-multiselect.css">-->
+   <link rel="stylesheet" type="text/css" href="bootstrap-multiselect.css">
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
-    <div class="row">
-        <div id="slide">
-            <div id="toggle">&#9776;</div>
+    <div class="row col-md-12" style="padding-right: 0px;">
+        <div id="slide" class="col-md-4">
+            <!--<div id="toggle">&#9776;</div>-->
             <div id="filters" class="smooth-scroll">
                 <div id="filterHeading">
                     <h2>FILTERS</h2>
@@ -38,27 +42,41 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-12 col-sm-8 main-content">
+        <div class="col-md-8 main-content">
             <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                 <div class="modal-dialog" role="document">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h5 class="modal-title" id="exampleModalLabel">Choose File</h5>
+                            <h5 class="modal-title" id="exampleModalLabel">Choose JSON File</h5>
                             <!--<button type="button" class="close" data-dismiss="modal" aria-label="Close">
                               <span aria-hidden="true">&times;</span>
                             </button>-->
                         </div>
                         <div class="modal-body">
-                            <input type="file" id="fileToLoad">
+                            <div class="col-md-4">
+                                <label class="btn btn-default" style="float:left">
+                                    Choose JSON File<input type="file" style="display:none;" accept=".JSON" id="fileToLoad">
+                                 </label>  
+                                 <span id="fileName"></span>
+                            </div>
+                        </br>
+                        </br>
+                        </br>
+                        <div class="col-md-4">
+                            <label style="float:left"><input style="vertical-align: text-bottom; margin-right:  5px;" type="checkbox" id="loadSample">Load Sample JSON</label>
+                        </div>
+                            
+                        </br>
+                        
                         </div>
                         <div class="modal-footer">
                             <!--<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>-->
-                            <button type="button" onclick="loadFileAsText()" class="btn btn-primary">Load Selected File</button>
+                            <button type="button" onclick="loadFileAsText()" id="loadFile" class="btn btn-primary">Load Selected File</button>
                         </div>
                     </div>
                 </div>
             </div>
-            <div id="paths" class="col-md-9">
+            <div id="paths" >
             </div>
         </div>    
     </div>
